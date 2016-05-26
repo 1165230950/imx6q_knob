@@ -1,0 +1,9 @@
+export DBG_ROOT_PATH=/home2/wangyihong/fly_linux
+export DBG_DRIVERS_PATH=$DBG_ROOT_PATH/drivers
+export DBG_BUILD_PATH=$DBG_ROOT_PATH/build/make
+export DBG_SOC_PATH=$DBG_ROOT_PATH/soc
+export DBG_COM_API_PATH=$DBG_ROOT_PATH/com_api
+export DBG_OUT_PATH=$DBG_ROOT_PATH/out
+export DBG_CALL_PATH=$DBG_ROOT_PATH/call
+export DBG_APP_PATH=$DBG_ROOT_PATH/apps
+export DBG_APP_BUILD_PATH=$DBG_APP_PATH/build

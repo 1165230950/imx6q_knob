@@ -1,0 +1,4 @@
+
+################driver select####################
+CONFIG_BUTTON=m
+CONFIG_NETLINK=m
