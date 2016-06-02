@@ -29,6 +29,9 @@ static const char *goodix_ts_name = "goodix-ts";
 static const char *goodix_input_phys = "input/ts";
 static struct workqueue_struct *goodix_wq;
 struct i2c_client * i2c_connect_client = NULL; 
+#ifdef EXTRACT_DRV
+struct i2c_client * public_client = NULL;
+#endif
 int gtp_rst_gpio;
 int gtp_int_gpio;
 u8 config[GTP_CONFIG_MAX_LENGTH + GTP_ADDR_LENGTH]
@@ -2461,6 +2464,7 @@ static int goodix_ts_probe(void)
 {
 	#ifdef EXTRACT_DRV
 	struct i2c_client *client = (struct i2c_client *)kzalloc( sizeof(struct i2c_client), GFP_KERNEL);
+	public_client = client;
 	client->addr = 0x14;
 	client->adapter = i2c_get_adapter(0);
 	#endif
@@ -2518,9 +2522,8 @@ static int goodix_ts_probe(void)
     spin_lock_init(&ts->esd_lock);
     // ts->esd_lock = SPIN_LOCK_UNLOCKED;
 #endif
-#ifndef EXTRACT_DRV
+
     i2c_set_clientdata(client, ts);
-#endif
     ts->gtp_rawdiff_mode = 0;
     ret = gtp_request_io_port(ts);
     if (ret < 0)
@@ -2628,8 +2631,15 @@ Input:
 Output:
     Executive outcomes. 0---succeed.
 *******************************************************/
+#ifndef EXTRACT_DRV
 static int goodix_ts_remove(struct i2c_client *client)
+#else
+static int goodix_ts_remove(void)
+#endif
 {
+	#ifdef EXTRACT_DRV
+	struct i2c_client *client = public_client;
+	#endif
     struct goodix_ts_data *ts = i2c_get_clientdata(client);
     
     GTP_DEBUG_FUNC();
@@ -2657,6 +2667,7 @@ static int goodix_ts_remove(struct i2c_client *client)
             hrtimer_cancel(&ts->timer);
         }
     }   
+
     
     GTP_INFO("GTP driver removing...");
     i2c_set_clientdata(client, NULL);
@@ -3192,9 +3203,15 @@ static void goodix_ts_exit(void)
 {
     GTP_DEBUG_FUNC();
     GTP_INFO("GTP driver exited.");
+	#ifndef EXTRACT_DRV
     i2c_del_driver(&goodix_ts_driver);
+	#else
+	int ret = goodix_ts_remove();
+	printk("goodix_ts_remove ret = %d\n", ret);
+	#endif
     if (goodix_wq)
     {
+    	printk("destroy_workqueue\n");
         destroy_workqueue(goodix_wq);
     }
 }
