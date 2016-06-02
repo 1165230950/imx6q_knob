@@ -29,9 +29,7 @@ static const char *goodix_ts_name = "goodix-ts";
 static const char *goodix_input_phys = "input/ts";
 static struct workqueue_struct *goodix_wq;
 struct i2c_client * i2c_connect_client = NULL; 
-#ifdef EXTRACT_DRV
 struct i2c_client * public_client = NULL;
-#endif
 int gtp_rst_gpio;
 int gtp_int_gpio;
 u8 config[GTP_CONFIG_MAX_LENGTH + GTP_ADDR_LENGTH]
@@ -220,11 +218,11 @@ s32 gtp_i2c_write(struct i2c_client *client,u8 *buf,s32 len)
     }
     if((retries >= 5))
     {
-    #ifndef EXTRACT_DRV
+
     #if GTP_COMPATIBLE_MODE
         struct goodix_ts_data *ts = i2c_get_clientdata(client);
     #endif
-    #endif
+
     #if GTP_GESTURE_WAKEUP
         if (DOZE_ENABLED == doze_status)
         {
@@ -232,7 +230,7 @@ s32 gtp_i2c_write(struct i2c_client *client,u8 *buf,s32 len)
         }
     #endif
         GTP_ERROR("I2C Write: 0x%04X, %d bytes failed, errcode: %d! Process reset.", (((u16)(buf[0] << 8)) | buf[1]), len-2, ret);
-	#ifndef EXTRACT_DRV
+
 	#if GTP_COMPATIBLE_MODE
         if (CHIP_TYPE_GT9F == ts->chip_type)
         { 
@@ -243,9 +241,6 @@ s32 gtp_i2c_write(struct i2c_client *client,u8 *buf,s32 len)
         {
             gtp_reset_guitar(client, 10);  
         }
-	#else
-		gtp_reset_guitar(client, 10);
-	#endif
     }
     return ret;
 }
@@ -311,7 +306,7 @@ s32 gtp_send_cfg(struct i2c_client *client)
 
 #if GTP_DRIVER_SEND_CFG
     s32 retry = 0;
-#ifndef EXTRACT_DRV
+
     struct goodix_ts_data *ts = i2c_get_clientdata(client);
 
     if (ts->pnl_init_error)
@@ -319,7 +314,6 @@ s32 gtp_send_cfg(struct i2c_client *client)
         GTP_INFO("Error occured in init_panel, no config sent");
         return 0;
     }
-#endif
     
     GTP_INFO("Driver send config.");
     for (retry = 0; retry < 5; retry++)
@@ -1094,11 +1088,11 @@ Output:
 void gtp_reset_guitar(struct i2c_client *client, s32 ms)
 {
 
-#ifndef EXTRACT_DRV
+
 #if GTP_COMPATIBLE_MODE
     struct goodix_ts_data *ts = i2c_get_clientdata(client);
 #endif    
-#endif
+
     GTP_DEBUG_FUNC();
     GTP_INFO("Guitar reset");
     GTP_GPIO_OUTPUT(gtp_rst_gpio, 0);   // begin select I2C slave addr
@@ -1112,14 +1106,14 @@ void gtp_reset_guitar(struct i2c_client *client, s32 ms)
     msleep(6);                          // T4: > 5ms
 
     GTP_GPIO_AS_INPUT(gtp_rst_gpio);    // end select I2C slave addr
-#ifndef EXTRACT_DRV
+
 #if GTP_COMPATIBLE_MODE
     if (CHIP_TYPE_GT9F == ts->chip_type)
     {
         return;
     }
 #endif
-#endif
+
 
     gtp_int_sync(50);  
 #if GTP_ESD_PROTECT
@@ -2456,18 +2450,17 @@ Output:
     Executive outcomes. 
         0: succeed.
 *******************************************************/
-#ifndef EXTRACT_DRV
-static int goodix_ts_probe(struct i2c_client *client, const struct i2c_device_id *id)
-#else
+
+//static int goodix_ts_probe(struct i2c_client *client, const struct i2c_device_id *id)
+
 static int goodix_ts_probe(void)
-#endif
 {
-	#ifdef EXTRACT_DRV
+
 	struct i2c_client *client = (struct i2c_client *)kzalloc( sizeof(struct i2c_client), GFP_KERNEL);
 	public_client = client;
 	client->addr = 0x14;
 	client->adapter = i2c_get_adapter(0);
-	#endif
+
 
     s32 ret = -1;
     struct goodix_ts_data *ts;
@@ -2493,8 +2486,9 @@ static int goodix_ts_probe(void)
         GTP_ERROR("Alloc GFP_KERNEL memory failed.");
         return -ENOMEM;
     }
-#ifndef EXTRACT_DRV
+
 #ifdef GTP_CONFIG_OF	/* device tree support */
+/*
     if (client->dev.of_node) {
 		gtp_parse_dt(&client->dev);
     }
@@ -2503,14 +2497,15 @@ static int goodix_ts_probe(void)
 		GTP_ERROR("GTP power on failed.");
 		return -EINVAL;
 	}
+*/
 #else			/* use gpio defined in gt9xx.h */
-	gtp_rst_gpio = GTP_RST_PORT;
-	gtp_int_gpio = GTP_INT_PORT;
+//	gtp_rst_gpio = GTP_RST_PORT;
+//	gtp_int_gpio = GTP_INT_PORT;
 #endif
-#else
+
 	gtp_rst_gpio = 111;
 	gtp_int_gpio = 110;
-#endif
+
 
     INIT_WORK(&ts->work, goodix_ts_work_func);
     ts->client = client;
@@ -2631,15 +2626,12 @@ Input:
 Output:
     Executive outcomes. 0---succeed.
 *******************************************************/
-#ifndef EXTRACT_DRV
-static int goodix_ts_remove(struct i2c_client *client)
-#else
+//static int goodix_ts_remove(struct i2c_client *client)
+
 static int goodix_ts_remove(void)
-#endif
 {
-	#ifdef EXTRACT_DRV
+
 	struct i2c_client *client = public_client;
-	#endif
     struct goodix_ts_data *ts = i2c_get_clientdata(client);
     
     GTP_DEBUG_FUNC();
@@ -2673,6 +2665,7 @@ static int goodix_ts_remove(void)
     i2c_set_clientdata(client, NULL);
     input_unregister_device(ts->input_dev);
     kfree(ts);
+	GTP_GPIO_FREE(gtp_rst_gpio);
 
     return 0;
 }
@@ -3182,12 +3175,12 @@ static int goodix_ts_init(void)
     gtp_esd_check_workqueue = create_workqueue("gtp_esd_check");
 #endif
     GTP_INFO("i2c_add_driver...");
-#ifndef EXTRACT_DRV
-    ret = i2c_add_driver(&goodix_ts_driver);
-#else
+
+//    ret = i2c_add_driver(&goodix_ts_driver);
+
 	ret = goodix_ts_probe();
 	printk("goodix_ts_probe ret = %d\n", ret);
-#endif
+
     return ret; 
 }
 
@@ -3203,12 +3196,12 @@ static void goodix_ts_exit(void)
 {
     GTP_DEBUG_FUNC();
     GTP_INFO("GTP driver exited.");
-	#ifndef EXTRACT_DRV
-    i2c_del_driver(&goodix_ts_driver);
-	#else
+
+//    i2c_del_driver(&goodix_ts_driver);
+
 	int ret = goodix_ts_remove();
 	printk("goodix_ts_remove ret = %d\n", ret);
-	#endif
+
     if (goodix_wq)
     {
     	printk("destroy_workqueue\n");
