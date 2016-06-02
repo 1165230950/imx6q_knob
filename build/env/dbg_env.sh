@@ -1,4 +1,4 @@
-export DBG_ROOT_PATH=/home2/wangyihong/fly_linux
+export DBG_ROOT_PATH=/home/hdj/VMware10.1/fsl_linux/imx6qdl-linux/linux-imx/fly_linux
 export DBG_DRIVERS_PATH=$DBG_ROOT_PATH/drivers
 export DBG_BUILD_PATH=$DBG_ROOT_PATH/build/make
 export DBG_SOC_PATH=$DBG_ROOT_PATH/soc
