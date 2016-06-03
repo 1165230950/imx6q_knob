@@ -86,15 +86,17 @@ struct hw_version_specific
 	int gpio_back_det;
 
     //i2c
-    int i2c_bus_dsi83;
-    int i2c_bus_bx5b3a;
-    int i2c_bus_ts;
-    int i2c_bus_gps;
-    int i2c_bus_saf7741;
-    int i2c_bus_tef6638;
-    int i2c_bus_lpc;
-    int i2c_bus_pca9634;
+	int i2c_bus_dsi83;
+	int i2c_bus_bx5b3a;
+	int i2c_bus_ts;
+	int i2c_bus_gps;
+	int i2c_bus_saf7741;
+	int i2c_bus_tef6638;
+	int i2c_bus_lpc;
+	int i2c_bus_pca9634;
 	int i2c_bus_accel;
+	int i2c_bus_addr;
+	int i2c_bus_addr_len;
 
 	//fm1388
 	int i2c_bus_fm1388;

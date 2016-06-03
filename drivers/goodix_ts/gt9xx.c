@@ -24,6 +24,8 @@
 #if GTP_ICS_SLOT_REPORT
     #include <linux/input/mt.h>
 #endif
+#include "../../soc/lidbg_target.h"
+extern int READ_I(char * buf, int len);
 
 static const char *goodix_ts_name = "goodix-ts";
 static const char *goodix_input_phys = "input/ts";
@@ -597,7 +599,8 @@ static void goodix_ts_work_func(struct work_struct *work)
 #if GTP_GESTURE_WAKEUP
     if (DOZE_ENABLED == doze_status)
     {               
-        ret = gtp_i2c_read(i2c_connect_client, doze_buf, 3);
+        //ret = gtp_i2c_read(i2c_connect_client, doze_buf, 3);
+        ret = READ_I(doze, 3);
         GTP_DEBUG("0x814B = 0x%02X", doze_buf[2]);
         if (ret > 0)
         {     
@@ -670,7 +673,8 @@ static void goodix_ts_work_func(struct work_struct *work)
     }
 #endif
 
-    ret = gtp_i2c_read(ts->client, point_data, 12);
+    //ret = gtp_i2c_read(ts->client, point_data, 12);
+    ret = READ_I(point_data, 12);
     if (ret < 0)
     {
         GTP_ERROR("I2C transfer error. errno:%d\n ", ret);
@@ -687,7 +691,8 @@ static void goodix_ts_work_func(struct work_struct *work)
     // GT9XXF reques event 
     if ((finger == 0x00) && (CHIP_TYPE_GT9F == ts->chip_type))     // request arrived
     {
-        ret = gtp_i2c_read(ts->client, rqst_buf, 3);
+        //ret = gtp_i2c_read(ts->client, rqst_buf, 3);
+        ret = READ_I(rqst_buf, 3);
         if (ret < 0)
         {
            GTP_ERROR("Read request status error!");
@@ -783,7 +788,8 @@ static void goodix_ts_work_func(struct work_struct *work)
     {
         u8 buf[8 * GTP_MAX_TOUCH] = {(GTP_READ_COOR_ADDR + 10) >> 8, (GTP_READ_COOR_ADDR + 10) & 0xff};
 
-        ret = gtp_i2c_read(ts->client, buf, 2 + 8 * (touch_num - 1)); 
+        //ret = gtp_i2c_read(ts->client, buf, 2 + 8 * (touch_num - 1)); 
+        ret = READ_I(buf, 2 + 8 * (touch_num - 1));
         memcpy(&point_data[12], &buf[2], 8 * (touch_num - 1));
     }
 
@@ -1193,7 +1199,8 @@ static s8 gtp_enter_sleep(struct goodix_ts_data * ts)
     if (CHIP_TYPE_GT9F == ts->chip_type)
     {
         // GT9XXF: host interact with ic
-        ret = gtp_i2c_read(ts->client, status_buf, 3);
+        //ret = gtp_i2c_read(ts->client, status_buf, 3);
+        ret = READ_I(status_buf, 3);
         if (ret < 0)
         {
             GTP_ERROR("failed to get backup-reference status");
@@ -1265,7 +1272,8 @@ static s8 gtp_wakeup_sleep(struct goodix_ts_data * ts)
                 continue;
             }
             opr_buf[2] = 0x00;
-            ret = gtp_i2c_read(ts->client, opr_buf, 3);
+            //ret = gtp_i2c_read(ts->client, opr_buf, 3);
+            ret = READ_I(opr_buf, 3);
             if (FAIL == ret)
             {
                 GTP_ERROR("failed to get ss51 & dsp status!");
@@ -1521,7 +1529,8 @@ static s32 gtp_init_panel(struct goodix_ts_data *ts)
 #else // driver not send config
 
     ts->gtp_cfg_len = GTP_CONFIG_MAX_LENGTH;
-    ret = gtp_i2c_read(ts->client, config, ts->gtp_cfg_len + GTP_ADDR_LENGTH);
+    //ret = gtp_i2c_read(ts->client, config, ts->gtp_cfg_len + GTP_ADDR_LENGTH);
+    ret = READ_I(config, ts->gtp_cfg_len + GTP_ADDR_LENGTH);
     if (ret < 0)
     {
         GTP_ERROR("Read Config Failed, Using Default Resolution & INT Trigger!");
@@ -1690,7 +1699,8 @@ s32 gtp_read_version(struct i2c_client *client, u16* version)
 
     GTP_DEBUG_FUNC();
 
-    ret = gtp_i2c_read(client, buf, sizeof(buf));
+    //ret = gtp_i2c_read(client, buf, sizeof(buf));
+    ret = READ_I(buf, sizeof(buf));
     if (ret < 0)
     {
         GTP_ERROR("GTP read version failed");
@@ -1733,7 +1743,8 @@ static s8 gtp_i2c_test(struct i2c_client *client)
   
     while(retry++ < 5)
     {
-        ret = gtp_i2c_read(client, test, 3);
+        //ret = gtp_i2c_read(client, test, 3);
+        ret = READ_I(test, 3);
         if (ret > 0)
         {
             return ret;
@@ -3214,3 +3225,4 @@ module_exit(goodix_ts_exit);
 
 MODULE_DESCRIPTION("GTP Series Driver");
 MODULE_LICENSE("GPL");
+EXPORT_SYMBOL(READ_I);
