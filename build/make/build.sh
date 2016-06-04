@@ -18,11 +18,11 @@ function build_dir()
 clear
 
 mkdir -pm 777 $DBG_OUT_PATH
-find ../../ -name "Module.symvers" -exec rm -rf {} \;
+#find ../../ -name "Module.symvers" -exec rm -rf {} \;
 
-build_dir $DBG_DRIVERS_PATH
+build_dir $DBG_CALL_PATH
 build_dir $DBG_SOC_PATH/$DBG_SOC
 build_dir $DBG_COM_API_PATH
-build_dir $DBG_CALL_PATH
+build_dir $DBG_DRIVERS_PATH
 . $DBG_BUILD_PATH/copy2out.sh
 

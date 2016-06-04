@@ -1,6 +1,8 @@
 #include <linux/init.h>
 #include <linux/module.h>
 #include <linux/kernel.h>
+#include <linux/i2c.h>
+
 
 static int export_api_init(void)
 {
