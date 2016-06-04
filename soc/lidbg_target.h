@@ -6,7 +6,7 @@
 
 #define GPIO_NOTHING LED_GPIO
 
-#define g_hw g_hw_version_specific[0]
+
 #define check_gpio(gpio) if((gpio == -1 )|| (gpio == 0)) break
 
 struct ad_key_item
@@ -137,6 +137,7 @@ struct hw_version_specific
 
 };
 extern struct hw_version_specific g_hw_version_specific[];
+#define g_hw g_hw_version_specific[0]
 
 #define FLYPARAMETER_NODE g_hw.fly_parameter_node
 #define SYSTEM_SWITCH_EN  g_hw.system_switch_en
@@ -149,6 +150,8 @@ extern struct hw_version_specific g_hw_version_specific[];
 #define TS_I2C_BUS      (g_hw.i2c_bus_ts)
 #define GTP_RST_PORT    (g_hw.gpio_ts_rst)
 #define GTP_INT_PORT    (g_hw.gpio_ts_int)
+#define ADDR (g_hw.i2c_bus_addr)
+#define ADDR_LEN (g_hw.i2c_bus_addr_len)
 
 //7741
 #define SAF7741_I2C_BUS  (g_hw.i2c_bus_saf7741)

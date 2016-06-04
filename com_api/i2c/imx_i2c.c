@@ -1,36 +1,48 @@
 #include "../../soc/lidbg_target.h"
+#include "../../drivers/goodix_ts/gt9xx.h"
 #include <linux/interrupt.h>
 #include <linux/irq.h>
 
 #if GTP_ICS_SLOT_REPORT
 #include <linux/input/mt.h>
 #endif
+#include <linux/i2c.h>
 #include <uapi/linux/i2c.h>
 
-extern int i2c_transfer(struct i2c_adapter *adap, struct i2c_msg *msgs, int num);
-extern struct i2c_adapter *i2c_get_adapter(int nr);
 extern struct hw_version_specific g_hw_version_specific[];
 
-int READ_I(char *buf, int len)
-{
 
-	struct i2c_adapter *adapter = i2c_get_adapter(g_hw_version_specific[0].i2c_bus_ts);
+int GET_INT_PORT(void)
+{
+	return GTP_INT_PORT;
+}
+int GET_RST_PORT(void)
+{
+	return GTP_RST_PORT;
+}
+
+EXPORT_SYMBOL(GET_INT_PORT);
+EXPORT_SYMBOL(GET_RST_PORT);
+
+int public_gtp_i2c_read(char *buf, int len)
+{
+	struct i2c_adapter *adapter = i2c_get_adapter(TS_I2C_BUS);
 	struct i2c_msg msgs[2];
 	s32 ret=-1;
 	s32 retries = 0;
 	
-	//GTP_DEBUG_FUNC();
+	GTP_DEBUG_FUNC();
 	
 	msgs[0].flags = !I2C_M_RD;
-	msgs[0].addr  = g_hw_version_specific[0].i2c_bus_addr;
-	msgs[0].len   = g_hw_version_specific[0].i2c_bus_addr_len;
+	msgs[0].addr  = ADDR;
+	msgs[0].len   = ADDR_LEN;
 	msgs[0].buf   = &buf[0];
 	//msgs[0].scl_rate = 300 * 1000;    // for Rockchip, etc.
 	
 	msgs[1].flags = I2C_M_RD;
-	msgs[1].addr  = g_hw_version_specific[0].i2c_bus_addr;
-	msgs[1].len   = len - g_hw_version_specific[0].i2c_bus_addr_len;
-	msgs[1].buf   = &buf[g_hw_version_specific[0].i2c_bus_addr_len];
+	msgs[1].addr  = ADDR;
+	msgs[1].len   = len - ADDR_LEN;
+	msgs[1].buf   = &buf[ADDR_LEN];
 	//msgs[1].scl_rate = 300 * 1000;
 	
 	while(retries < 5)
@@ -41,13 +53,37 @@ int READ_I(char *buf, int len)
 	}
 	if((retries >= 5))
 	{
+		GTP_ERROR("I2C Read: 0x%04X, %d bytes failed, errcode: %d! Process reset.", (((u16)(buf[0] << 8)) | buf[1]), len-2, ret);
 		return -1;
 	}
 	return ret;
 }
-/*s32 public_gtp_i2c_write(u8 *buf, s32 len)
+int public_gtp_i2c_write(char *buf, int len)
 {
-	return 0;
+	struct i2c_adapter *adapter = i2c_get_adapter(TS_I2C_BUS);
+	struct i2c_msg msg;
+	s32 ret = -1;
+	s32 retries = 0;
+	
+	GTP_DEBUG_FUNC();
+	
+	msg.flags = !I2C_M_RD;
+	msg.addr  = ADDR;
+	msg.len   = len;
+	msg.buf   = buf;
+	
+	while(retries < 5)
+	{
+	    ret = i2c_transfer(adapter, &msg, 1);
+	    if (ret == 1)break;
+	    retries++;
+	}
+	if((retries >= 5))
+	{
+		GTP_ERROR("I2C Write: 0x%04X, %d bytes failed, errcode: %d! Process reset.", (((u16)(buf[0] << 8)) | buf[1]), len-2, ret);
+	}
+	return ret;
 }
-*/
-EXPORT_SYMBOL(READ_I);
+
+EXPORT_SYMBOL(public_gtp_i2c_read);
+EXPORT_SYMBOL(public_gtp_i2c_write);

@@ -258,8 +258,8 @@ extern int gtp_int_gpio;
     }
 
 // STEP_2(REQUIRED): Customize your I/O ports & I/O operations
-#define GTP_RST_PORT    16//S5PV210_GPJ3(6)
-#define GTP_INT_PORT    17//S5PV210_GPH1(3)
+//#define GTP_RST_PORT    16//S5PV210_GPJ3(6)
+//#define GTP_INT_PORT    17//S5PV210_GPH1(3)
 
 #define GTP_GPIO_AS_INPUT(pin)          do{\
                                             gpio_direction_input(pin);\
