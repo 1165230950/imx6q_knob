@@ -11,22 +11,13 @@
 
 extern struct hw_version_specific g_hw_version_specific[];
 
-
-int GET_INT_PORT(void)
-{
-	return GTP_INT_PORT;
-}
-int GET_RST_PORT(void)
-{
-	return GTP_RST_PORT;
-}
-
-EXPORT_SYMBOL(GET_INT_PORT);
-EXPORT_SYMBOL(GET_RST_PORT);
-
-int public_gtp_i2c_read(char *buf, int len)
+int soc_i2c_read(char *buf, int len)
 {
 	struct i2c_adapter *adapter = i2c_get_adapter(TS_I2C_BUS);
+	if(!adapter){
+		printk("i2c get adapter failed\n");
+		return -1;
+	}
 	struct i2c_msg msgs[2];
 	s32 ret=-1;
 	s32 retries = 0;
@@ -58,9 +49,13 @@ int public_gtp_i2c_read(char *buf, int len)
 	}
 	return ret;
 }
-int public_gtp_i2c_write(char *buf, int len)
+int soc_i2c_write(char *buf, int len)
 {
 	struct i2c_adapter *adapter = i2c_get_adapter(TS_I2C_BUS);
+	if(!adapter){
+		printk("i2c get adapter failed\n");
+		return -1;
+	}
 	struct i2c_msg msg;
 	s32 ret = -1;
 	s32 retries = 0;
@@ -85,5 +80,5 @@ int public_gtp_i2c_write(char *buf, int len)
 	return ret;
 }
 
-EXPORT_SYMBOL(public_gtp_i2c_read);
-EXPORT_SYMBOL(public_gtp_i2c_write);
+EXPORT_SYMBOL(soc_i2c_read);
+EXPORT_SYMBOL(soc_i2c_write);
