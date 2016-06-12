@@ -27,40 +27,41 @@ extern bool SOC_IO_ISR_Add(u32 irq, u32  interrupt_type, pinterrupt_isr func, vo
 	}while(0)\
 
 
-struct work_struct work_left_button1;
-struct work_struct work_left_button2;
-struct input_dev *knob_left_dev1;
-struct input_dev *knob_left_dev2;
-struct input_dev *knob_right_dev1;
-struct input_dev *knob_right_dev2;
-static int val;
-static int val1;
-static int val2;
-static int val3;
-static void work_left_button1_fn(struct work_struct *work)
+
+struct work_struct work_right_knob_k1;
+struct work_struct work_right_knob_k2;
+struct work_struct work_left_knob_k3;
+struct work_struct work_left_knob_k4;
+
+struct input_dev *right_knob_dev_k1;
+struct input_dev *right_knob_dev_k2;
+struct input_dev *left_knob_dev_k3;
+struct input_dev *left_knob_dev_k4;
+
+static int k1_val;
+static int k2_val;
+static int k3_val;
+static int k4_val;
+static void work_right_knob_k1_fn(struct work_struct *work)
 {
 
-	val = gpio_get_value(102);
-	val1 = gpio_get_value(103);
-	val2 = gpio_get_value(104);
-	val3 = gpio_get_value(105);
-	printk("val : %d val1 : %d val2 : %d val3 : %d\n");
-	
-	/* 1??????????? */
-	if(val)
+	k1_val = gpio_get_value(102);
+	k2_val = gpio_get_value(103);
+	k3_val = gpio_get_value(104);
+	k4_val = gpio_get_value(105);
+
+	if(k1_val)
 	{
-		printk(KERN_CRIT "FUNC:%s LINE:%d val:%d \n",__func__,__LINE__, val);
+		printk(KERN_CRIT "FUNC:%s LINE:%d val:%d \n",__func__,__LINE__, k1_val);
 		/*        if(g_var.recovery_mode == 1)
 			  SOC_Key_Report(KEY_UP, KEY_PRESSED_RELEASED);
 			  else
 			  SOC_Key_Report(KEY_VOLUMEUP, KEY_PRESSED_RELEASED);
 		 */
 	}
-
-	/* 2??????????? */
-	if(val == 0)
+	if(k1_val == 0)
 	{
-		printk(KERN_CRIT "FUNC:%s LINE:%d val:%d \n",__func__,__LINE__, val);
+		printk(KERN_CRIT "FUNC:%s LINE:%d val:%d \n",__func__,__LINE__, k1_val);
 		/*if(g_var.recovery_mode == 1)
 		  SOC_Key_Report(KEY_DOWN, KEY_PRESSED_RELEASED);
 		  else
@@ -70,139 +71,93 @@ static void work_left_button1_fn(struct work_struct *work)
 
 }
 
-static void work_left_button2_fn(struct work_struct *work)
+static void work_right_knob_k2_fn(struct work_struct *work)
 {
-val = gpio_get_value(102);
-	val1 = gpio_get_value(103);
-	val2 = gpio_get_value(104);
-	val3 = gpio_get_value(105);
+	k1_val = gpio_get_value(102);
+	k2_val = gpio_get_value(103);
+	k3_val = gpio_get_value(104);
+	k4_val = gpio_get_value(105);
 
-	printk("val : %d val1 : %d val2 : %d val3 : %d\n");
-
-	/* 1??????????? */
-	if(val)
+	if(k2_val)
 	{
-		printk(KERN_CRIT "FUNC:%s LINE:%d val:%d \n",__func__,__LINE__, val);
-		/*  if(g_var.recovery_mode == 1)
-		    SOC_Key_Report(KEY_UP, KEY_PRESSED_RELEASED);
-		    else
-		    SOC_Key_Report(KEY_VOLUMEUP, KEY_PRESSED_RELEASED);
-		 */
+		printk(KERN_CRIT "FUNC:%s LINE:%d val:%d \n",__func__,__LINE__, k2_val);
 	}
-
-	/* 2??????????? */
-	if(val == 0)
+	if(k2_val == 0)
 	{
-		printk(KERN_CRIT "FUNC:%s LINE:%d val:%d \n",__func__,__LINE__, val);
-		/*    if(g_var.recovery_mode == 1)
-		      SOC_Key_Report(KEY_DOWN, KEY_PRESSED_RELEASED);
-		      else
-		      SOC_Key_Report(KEY_VOLUMEDOWN, KEY_PRESSED_RELEASED);
-		 */
+		printk(KERN_CRIT "FUNC:%s LINE:%d val:%d \n",__func__,__LINE__, k2_val);
 	}
 
 }
-struct work_struct work_right_button1;
-static void work_right_button1_fn(struct work_struct *work)
+
+static void work_left_knob_k3_fn(struct work_struct *work)
 {
-val = gpio_get_value(102);
-	val1 = gpio_get_value(103);
-	val2 = gpio_get_value(104);
-	val3 = gpio_get_value(105);
-	printk("val : %d val1 : %d val2 : %d val3 : %d\n");
-	/* 1??????????? */
-	if(val)
+	k1_val = gpio_get_value(102);
+	k2_val = gpio_get_value(103);
+	k3_val = gpio_get_value(104);
+	k4_val = gpio_get_value(105);
+
+	if(k3_val)
 	{
-		printk(KERN_CRIT "FUNC:%s LINE:%d val:%d \n",__func__,__LINE__, val);
-		/*      if(g_var.recovery_mode == 1)
-			SOC_Key_Report(KEY_UP, KEY_PRESSED_RELEASED);
-			else
-			SOC_Key_Report(KEY_VOLUMEUP, KEY_PRESSED_RELEASED);
-		 */
+		printk(KERN_CRIT "FUNC:%s LINE:%d val:%d \n",__func__,__LINE__, k3_val);
 	}
 
-	/* 2??????????? */
-	if(val == 0)
+	if(k3_val == 0)
 	{
-		printk(KERN_CRIT "FUNC:%s LINE:%d val:%d \n",__func__,__LINE__, val);
-		/*        if(g_var.recovery_mode == 1)
-			  SOC_Key_Report(KEY_DOWN, KEY_PRESSED_RELEASED);
-			  else
-			  SOC_Key_Report(KEY_VOLUMEDOWN, KEY_PRESSED_RELEASED);
-		 */
+		printk(KERN_CRIT "FUNC:%s LINE:%d val:%d \n",__func__,__LINE__, k3_val);
 	}
 }
 
-struct work_struct work_right_button2;
-static void work_right_button2_fn(struct work_struct *work)
+static void work_left_knob_k4_fn(struct work_struct *work)
 {
-	val = gpio_get_value(102);
-	val1 = gpio_get_value(103);
-	val2 = gpio_get_value(104);
-	val3 = gpio_get_value(105);
-	printk("val : %d val1 : %d val2 : %d val3 : %d\n", val, val1, val2, val3);
-	/* 1??????????? */
-	if(val)
-	{
-		printk(KERN_CRIT "FUNC:%s LINE:%d val:%d \n",__func__,__LINE__, val);
-		/*        if(g_var.recovery_mode == 1)
-			  SOC_Key_Report(KEY_UP, KEY_PRESSED_RELEASED);
-			  else
-			  SOC_Key_Report(KEY_VOLUMEUP, KEY_PRESSED_RELEASED);
-		 */
-	}
+	k1_val = gpio_get_value(102);
+	k2_val = gpio_get_value(103);
+	k3_val = gpio_get_value(104);
+	k4_val = gpio_get_value(105);
 
-	/* 2??????????? */
-	if(val == 0)
+	if(k4_val)
 	{
-		printk(KERN_CRIT "FUNC:%s LINE:%d val:%d \n",__func__,__LINE__, val);
-		/*        if(g_var.recovery_mode == 1)
-			  SOC_Key_Report(KEY_DOWN, KEY_PRESSED_RELEASED);
-			  else
-			  SOC_Key_Report(KEY_VOLUMEDOWN, KEY_PRESSED_RELEASED);
-		 */
+		printk(KERN_CRIT "FUNC:%s LINE:%d val:%d \n",__func__,__LINE__, k4_val);
+	}
+	if(k4_val == 0)
+	{
+		printk(KERN_CRIT "FUNC:%s LINE:%d val:%d \n",__func__,__LINE__, k4_val);
 	}
 }
 
 
-irqreturn_t irq_left_button1(int irq, void *dev_id)
+irqreturn_t irq_right_knob_k1(int irq, void *dev_id)
 {
 	//lidbg("irq_left_button1: %d\n", irq);
-	val = SOC_IO_Input(BUTTON_LEFT_2, BUTTON_LEFT_2, 0);
-	if(!work_pending(&work_left_button1))
-		schedule_work(&work_left_button1);
+	k1_val = SOC_IO_Input(BUTTON_LEFT_2, BUTTON_LEFT_2, 0);
+	if(!work_pending(&work_left_knob_k3))
+		schedule_work(&work_left_knob_k3);
 	return IRQ_HANDLED;
 
 }
-irqreturn_t irq_left_button2(int irq, void *dev_id)
+irqreturn_t irq_right_knob_k2(int irq, void *dev_id)
 {
-	val = SOC_IO_Input(BUTTON_LEFT_1, BUTTON_LEFT_1, 0 /*GPIO_CFG_PULL_UP*/);
-	//lidbg("irq_left_button2: %d\n", irq);
-	if(!work_pending(&work_left_button2))
-		schedule_work(&work_left_button2);
+	k2_val = SOC_IO_Input(BUTTON_LEFT_1, BUTTON_LEFT_1, 0 /*GPIO_CFG_PULL_UP*/);
+	if(!work_pending(&work_left_knob_k4))
+		schedule_work(&work_left_knob_k4);
 	return IRQ_HANDLED;
 }
 
 
 
 
-irqreturn_t irq_right_button1(int irq, void *dev_id)
+irqreturn_t irq_left_knob_k3(int irq, void *dev_id)
 {
-	//lidbg("irq_right_button1: %d\n", irq);
-
-	val = SOC_IO_Input(BUTTON_RIGHT_2, BUTTON_RIGHT_2, 0 /*GPIO_CFG_PULL_UP*/);
-	if(!work_pending(&work_right_button1))
-		schedule_work(&work_right_button1);
+	k3_val = SOC_IO_Input(BUTTON_RIGHT_2, BUTTON_RIGHT_2, 0 /*GPIO_CFG_PULL_UP*/);
+	if(!work_pending(&work_right_knob_k1))
+		schedule_work(&work_right_knob_k2);
 	return IRQ_HANDLED;
 }
-irqreturn_t irq_right_button2(int irq, void *dev_id)
+irqreturn_t irq_left_knob_k4(int irq, void *dev_id)
 {
 	printk("hello button2\n");
-	//lidbg("irq_right_button2: %d\n", irq);
-
-	//val = SOC_IO_Input(BUTTON_RIGHT_1, BUTTON_RIGHT_1, 0 /*GPIO_CFG_PULL_UP*/);
-	if(!work_pending(&work_right_button2))
-		schedule_work(&work_right_button2);
+	k4_val = SOC_IO_Input(BUTTON_RIGHT_1, BUTTON_RIGHT_1, 0 /*GPIO_CFG_PULL_UP*/);
+	if(!work_pending(&work_right_knob_k2))
+		schedule_work(&work_right_knob_k2);
 	return IRQ_HANDLED;
 }
 
@@ -241,21 +196,21 @@ void button_init(void)
 	printk(KERN_CRIT "button_init\n");
 	if(button_en)
 	{
-		INIT_WORK(&work_left_button1, work_left_button1_fn);
-		INIT_WORK(&work_left_button2, work_left_button2_fn);
+		INIT_WORK(&work_left_knob_k3, work_left_knob_k3_fn);
+		INIT_WORK(&work_left_knob_k4, work_left_knob_k4_fn);
 
-		INIT_WORK(&work_right_button1, work_right_button1_fn);
-		INIT_WORK(&work_right_button2, work_right_button2_fn);
+		INIT_WORK(&work_right_knob_k1, work_right_knob_k1_fn);
+		INIT_WORK(&work_right_knob_k2, work_right_knob_k2_fn);
 
 		SOC_IO_Input(BUTTON_LEFT_1, BUTTON_LEFT_1, 0);
 		SOC_IO_Input(BUTTON_LEFT_2, BUTTON_LEFT_2, 0);
 		SOC_IO_Input(BUTTON_RIGHT_1, BUTTON_RIGHT_1, 0);
 		SOC_IO_Input(BUTTON_RIGHT_2, BUTTON_RIGHT_2, 0);
 
-		SOC_IO_ISR_Add(BUTTON_LEFT_1, IRQF_TRIGGER_RISING , irq_left_button1, NULL);
-		SOC_IO_ISR_Add(BUTTON_LEFT_2, IRQF_TRIGGER_FALLING, irq_left_button2, NULL);
-		SOC_IO_ISR_Add(BUTTON_RIGHT_1, IRQF_TRIGGER_RISING, irq_right_button1, NULL);
-		SOC_IO_ISR_Add(BUTTON_RIGHT_2, IRQF_TRIGGER_FALLING, irq_right_button2, NULL);
+		SOC_IO_ISR_Add(BUTTON_LEFT_1, IRQF_TRIGGER_RISING , irq_left_knob_k3, NULL);
+		SOC_IO_ISR_Add(BUTTON_LEFT_2, IRQF_TRIGGER_FALLING, irq_left_knob_k4, NULL);
+		SOC_IO_ISR_Add(BUTTON_RIGHT_1, IRQF_TRIGGER_RISING, irq_right_knob_k1, NULL);
+		SOC_IO_ISR_Add(BUTTON_RIGHT_2, IRQF_TRIGGER_FALLING, irq_right_knob_k2, NULL);
 		
 	}
 }
