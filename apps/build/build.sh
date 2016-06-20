@@ -20,4 +20,5 @@ clear
 mkdir -pm 777 $DBG_OUT_PATH
 
 build_dir $DBG_APP_PATH/test_app
+build_dir $DBG_APP_PATH/knob
 

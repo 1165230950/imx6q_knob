@@ -1742,7 +1742,7 @@ static s8 gtp_request_input_dev(struct goodix_ts_data *ts)
     ts->input_dev->id.vendor = 0xDEAD;
     ts->input_dev->id.product = 0xBEEF;
     ts->input_dev->id.version = 10427;
-    
+
     ret = input_register_device(ts->input_dev);
     if (ret)
     {
